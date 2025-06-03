@@ -11,6 +11,9 @@
   "keywords": [
     "Sample"
   ],
+  "dependencies": {
+    "com.willneedit.ipfs.iface": "1.0.0"
+  },
   "author": "willneedit",
   "license": "MPL-2.0"
 }

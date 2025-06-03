@@ -1,7 +1,9 @@
 {
     "name": "com.willneedit.arteranos.common",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:7a2109e87521d6f4eb0090fc79e201f0"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

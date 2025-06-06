@@ -56,13 +56,13 @@ namespace Arteranos.Common
             return user;
         }
 
-        public static UserIDJSON Load(Func<string> readerFunc)
+        public static UserIDJSON Load()
         {
             UserIDJSON uid;
 
             try
             {
-                string json = readerFunc();
+                string json = ConfigUtils.ReadTextConfig(PATH_USER_ID);
                 uid = JsonConvert.DeserializeObject<UserIDJSON>(json);
             }
             catch (Exception e)
@@ -74,7 +74,7 @@ namespace Arteranos.Common
             return uid;
         }
 
-        public void Save(Action<string> writerFunc)
+        public void Save()
         {
             try
             {
@@ -82,7 +82,7 @@ namespace Arteranos.Common
                     throw new InvalidDataException("Invalid User ID naterial");
 
                 string json = JsonConvert.SerializeObject(this, Formatting.Indented);
-                writerFunc(json);
+                ConfigUtils.WriteTextConfig(PATH_USER_ID, json);
             }
             catch (Exception e)
             {

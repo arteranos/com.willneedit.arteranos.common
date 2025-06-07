@@ -7,7 +7,9 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using ProtoBuf;
+using UnityEngine;
 
 namespace Arteranos.Common
 {
@@ -29,7 +31,8 @@ namespace Arteranos.Common
         }
     }
 
-    public partial class ServerPermissions : IEquatable<ServerPermissions>, ICloneable
+    [ProtoContract]
+    public class ServerPermissions : IEquatable<ServerPermissions>, ICloneable
     {
         // CONTENT MODERATION / FILTERING
         // null allowed, and the user's filter could yield an inexact match, second only
@@ -208,5 +211,40 @@ namespace Arteranos.Common
         {
             return !(left == right);
         }
+
+        // ---------------------------------------------------------------
+        public const string PATH_USER_PERMS = "Permissions.json";
+
+        public static ServerPermissions Load()
+        {
+            ServerPermissions perms;
+
+            try
+            {
+                string json = ConfigUtils.ReadTextConfig(PATH_USER_PERMS);
+                perms = JsonConvert.DeserializeObject<ServerPermissions>(json);
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"Failed to load Content permissions: {e.Message}");
+                perms = null;
+            }
+
+            return perms;
+        }
+
+        public void Save()
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+                ConfigUtils.WriteTextConfig(PATH_USER_PERMS, json);
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"Failed to save Content permissions: {e.Message}");
+            }
+        }
+
     }
 }

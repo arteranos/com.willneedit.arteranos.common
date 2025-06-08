@@ -26,9 +26,17 @@ namespace Arteranos.Common
 
         private SignKey _SignKey = null;
 
+        // Cast into...
+        //  - bool      : Validity
+        //  - SignKey   : Complete keypair, for signing/verifying
+        //  - UserID    ; PublicKey/Nickname/Icon, for public consumption
+        //  - PublicKey ; For verifying
+        //  - Cid       : Icon's CID
+        //  - string    : Nickname
+
         public static implicit operator bool(UserIDJSON u) => u.SignKeyPair != null && u.Nickname != null;
 
-        public static implicit operator SignKey(UserIDJSON u)
+        public static explicit operator SignKey(UserIDJSON u)
         {
             if (u._SignKey == null)
                 u._SignKey = SignKey.ImportPrivateKey(u.SignKeyPair);
@@ -39,6 +47,10 @@ namespace Arteranos.Common
         public static implicit operator PublicKey(UserIDJSON u) => ((SignKey)u).PublicKey;
 
         public static implicit operator UserID(UserIDJSON u) => new(u, u.Nickname, u.Icon);
+
+        public static explicit operator Cid(UserIDJSON u) => u.Icon;
+
+        public static explicit operator string(UserIDJSON u) => u.Nickname;
 
         public static UserIDJSON Generate()
         {

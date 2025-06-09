@@ -132,6 +132,8 @@ namespace Arteranos.Common
 
                 string json = JsonConvert.SerializeObject(this, Formatting.Indented);
                 ConfigUtils.WriteTextConfig(PATH_USER_ID, json);
+
+                _dirty = false;
             }
             catch (Exception e)
             {

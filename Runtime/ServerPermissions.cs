@@ -65,29 +65,91 @@ namespace Arteranos.Common
         // Impersonation - FALSE - Self-explanatory
 
         [ProtoMember(1)]
-        public bool? Flying;
+        public bool? Flying
+        {
+            get => _flying;
+            set
+            {
+                if (_flying == value) return;
+                _flying = value;
+                _dirty = true;
+            }
+        }
 
         // Other Nudity (eg. non-sexual or artistic)
         [ProtoMember(2)]
-        public bool? Nudity;
+        public bool? Nudity
+        {
+            get => _nudity;
+            set
+            {
+                if (_nudity == value) return;
+                _nudity = value;
+                _dirty = true;
+            }
+        }
 
         // Sexually suggestive (does not include nudity)
         [ProtoMember(3)]
-        public bool? Suggestive;
+        public bool? Suggestive
+        {
+            get => _suggestive;
+            set
+            {
+                if (_suggestive == value) return;
+                _suggestive = value;
+                _dirty = true;
+            }
+        }
 
         // Violence (Cartoon / "Clean" violence)
         [ProtoMember(4)]
-        public bool? Violence;
+        public bool? Violence
+        {
+            get => _violence;
+            set
+            {
+                if (_violence == value) return;
+                _violence = value;
+                _dirty = true;
+            }
+        }
 
         // Explicit Sexual Images
         [ProtoMember(5)]
-        public bool? ExplicitNudes;
+        public bool? ExplicitNudes
+        {
+            get => _explicitNudes;
+            set
+            {
+                if (_explicitNudes == value) return;
+                _explicitNudes = value;
+                _dirty = true;
+            }
+        }
 
-        // NEW
-        //
-        // Excessive Violence / Blood (Gore, self-harm, torture)
+        // NEW - Excessive Violence / Blood (Gore, self-harm, torture)
         [ProtoMember(6)]
-        public bool? ExcessiveViolence;
+        public bool? ExcessiveViolence
+        {
+            get => _excessiveViolence;
+            set
+            {
+                if (_excessiveViolence == value) return;
+                _excessiveViolence = value;
+                _dirty = true;
+            }
+        }
+
+        private bool? _flying;
+        private bool? _nudity;
+        private bool? _suggestive;
+        private bool? _violence;
+        private bool? _explicitNudes;
+        private bool? _excessiveViolence;
+
+
+        private bool _dirty = true;
 
         public ServerPermissions() { }
 
@@ -223,6 +285,8 @@ namespace Arteranos.Common
             {
                 string json = ConfigUtils.ReadTextConfig(PATH_USER_PERMS);
                 perms = JsonConvert.DeserializeObject<ServerPermissions>(json);
+
+                perms._dirty = false;
             }
             catch (Exception e)
             {
@@ -237,8 +301,13 @@ namespace Arteranos.Common
         {
             try
             {
+                if (!_dirty) return;
+
                 string json = JsonConvert.SerializeObject(this, Formatting.Indented);
                 ConfigUtils.WriteTextConfig(PATH_USER_PERMS, json);
+
+                _dirty = false;
+
             }
             catch (Exception e)
             {

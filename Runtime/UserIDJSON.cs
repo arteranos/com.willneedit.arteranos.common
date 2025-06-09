@@ -13,6 +13,7 @@ using Arteranos.Common.Cryptography;
 using Ipfs;
 using Ipfs.Cryptography.Proto;
 using System.IO;
+using System.Linq;
 
 namespace Arteranos.Common
 {
@@ -20,11 +21,42 @@ namespace Arteranos.Common
     {
         public const string PATH_USER_ID = "UserID.json";
 
-        public byte[] SignKeyPair = null;
-        public string Nickname = null;
-        public Cid Icon = null;
+        public byte[] SignKeyPair
+        {
+            get => _signKeyPair;
+            set
+            {
+                if (value != null && _signKeyPair != null && _signKeyPair.SequenceEqual(value)) return;
+                _signKeyPair = value;
+                _dirty = true;
+            }
+        }
+        public string Nickname
+        {
+            get => _nickname;
+            set
+            {
+                if (value == _nickname) return;
+                _nickname = value;
+                _dirty = true;
+            }
+        }
+        public Cid Icon
+        {
+            get => _icon;
+            set
+            {
+                if (value == _icon) return;
+                _icon = value;
+                _dirty = true;
+            }
+        }
 
+        private byte[] _signKeyPair = null;
+        private string _nickname = null;
+        private Cid _icon = null;
         private SignKey _SignKey = null;
+        private bool _dirty = true;
 
         // Cast into...
         //  - bool      : Validity
@@ -63,7 +95,8 @@ namespace Arteranos.Common
             };
 
             SignKey key = SignKey.Generate();
-            key.ExportPrivateKey(out user.SignKeyPair);
+            key.ExportPrivateKey(out user._signKeyPair);
+            user._dirty = true;
 
             return user;
         }
@@ -76,6 +109,8 @@ namespace Arteranos.Common
             {
                 string json = ConfigUtils.ReadTextConfig(PATH_USER_ID);
                 uid = JsonConvert.DeserializeObject<UserIDJSON>(json);
+
+                uid._dirty = false;
             }
             catch (Exception e)
             {
@@ -92,6 +127,8 @@ namespace Arteranos.Common
             {
                 if (!this)
                     throw new InvalidDataException("Invalid User ID naterial");
+
+                if (!_dirty) return;
 
                 string json = JsonConvert.SerializeObject(this, Formatting.Indented);
                 ConfigUtils.WriteTextConfig(PATH_USER_ID, json);

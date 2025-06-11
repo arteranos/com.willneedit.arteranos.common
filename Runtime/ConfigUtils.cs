@@ -30,6 +30,7 @@ namespace Arteranos.Common
         private static readonly string _persistentDataPath = Application.persistentDataPath;
         private static readonly string _temporaryCachePath = Application.temporaryCachePath;
         private static readonly string _productName = Application.productName;
+        private static readonly string _companyName = Application.companyName;
 
 #pragma warning disable IDE1006 // Benennungsstile
         // Arteranos.Common and SDK MAY be included into other projects (like, premade worlds) with different names.
@@ -37,11 +38,12 @@ namespace Arteranos.Common
 
         public static string GetPathWithArteranos(string providedPathName, bool? isServer)
         {
+            string subdirName = $"{_companyName}/{_productName}";
             string destName = isServer ?? Unity_Server
-                ? "Arteranos_DedicatedServer"
-                : "Arteranos";
+                ? "willneedit/Arteranos_DedicatedServer"
+                : "willneedit/Arteranos";
 
-            return $"{providedPathName[0..^_productName.Length]}{destName}";
+            return $"{providedPathName[0..^subdirName.Length]}{destName}";
         }
         public static string persistentDataPath => GetPathWithArteranos(_persistentDataPath, null);
 

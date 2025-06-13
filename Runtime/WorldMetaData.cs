@@ -19,7 +19,7 @@ namespace Arteranos.Common
         public string WorldName = "Unnamed World";
         public string WorldDescription = string.Empty;
         public UserID AuthorID = null;
-        public ServerPermissions ContentRating = null;
+        public PermissionsJSON ContentRating = null;
         public DateTime Created = DateTime.MinValue;
 
         public void SaveDefaults()

@@ -32,7 +32,7 @@ namespace Arteranos.Common
     }
 
     [ProtoContract]
-    public class ServerPermissions : IEquatable<ServerPermissions>, ICloneable
+    public class PermissionsJSON : IEquatable<PermissionsJSON>, ICloneable
     {
         // CONTENT MODERATION / FILTERING
         // null allowed, and the user's filter could yield an inexact match, second only
@@ -151,9 +151,9 @@ namespace Arteranos.Common
 
         private bool _dirty = true;
 
-        public ServerPermissions() { }
+        public PermissionsJSON() { }
 
-        public ServerPermissions(bool _)
+        public PermissionsJSON(bool _)
         {
             Flying = false;
 
@@ -164,7 +164,7 @@ namespace Arteranos.Common
             ExcessiveViolence = false;
         }
 
-        public (int, int) MatchRatio(ServerPermissions user)
+        public (int, int) MatchRatio(PermissionsJSON user)
         {
             static int possibleScore(bool? b1) => b1 == null ? 2 : 5;
 
@@ -194,7 +194,7 @@ namespace Arteranos.Common
             return (index, possible);
         }
 
-        public string HumanReadableMI(ServerPermissions user)
+        public string HumanReadableMI(PermissionsJSON user)
         {
             (int index, int possible) = MatchRatio(user);
             float ratio = (float)index / (float)possible;
@@ -212,7 +212,7 @@ namespace Arteranos.Common
             return $"{index} ({str})";
         }
 
-        public bool IsInViolation(ServerPermissions serverPerms)
+        public bool IsInViolation(PermissionsJSON serverPerms)
         {
             int points = 0;
 
@@ -243,10 +243,10 @@ namespace Arteranos.Common
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as ServerPermissions);
+            return Equals(obj as PermissionsJSON);
         }
 
-        public bool Equals(ServerPermissions other)
+        public bool Equals(PermissionsJSON other)
         {
             return other is not null &&
                    Flying == other.Flying &&
@@ -264,12 +264,12 @@ namespace Arteranos.Common
 
         public object Clone() => MemberwiseClone();
 
-        public static bool operator ==(ServerPermissions left, ServerPermissions right)
+        public static bool operator ==(PermissionsJSON left, PermissionsJSON right)
         {
-            return EqualityComparer<ServerPermissions>.Default.Equals(left, right);
+            return EqualityComparer<PermissionsJSON>.Default.Equals(left, right);
         }
 
-        public static bool operator !=(ServerPermissions left, ServerPermissions right)
+        public static bool operator !=(PermissionsJSON left, PermissionsJSON right)
         {
             return !(left == right);
         }
@@ -277,14 +277,14 @@ namespace Arteranos.Common
         // ---------------------------------------------------------------
         public const string PATH_USER_PERMS = "Permissions.json";
 
-        public static ServerPermissions Load()
+        public static PermissionsJSON Load()
         {
-            ServerPermissions perms;
+            PermissionsJSON perms;
 
             try
             {
                 string json = ConfigUtils.ReadTextConfig(PATH_USER_PERMS);
-                perms = JsonConvert.DeserializeObject<ServerPermissions>(json);
+                perms = JsonConvert.DeserializeObject<PermissionsJSON>(json);
 
                 perms._dirty = false;
             }

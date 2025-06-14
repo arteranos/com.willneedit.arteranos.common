@@ -235,14 +235,13 @@ namespace Arteranos.Common
         /// Returns combined block/neither/friend state
         /// </summary>
         /// <param name="target">The user</param>
-        /// <param name="offline">Make do with offline/logged out/remote users</param>
+        /// <param name="unilaterally">Only use the view from you to him</param>
         /// <returns>false - blocked;null - neither;true - friend</returns>
-        public bool? IsStated(UserID target, bool offline = false)
+        public bool? IsStated(UserID target, bool unilaterally = false)
         {
-            if (IsBlocked(target)) return false;
+            if (_blockImposed.Contains(target) || (!unilaterally && IsBlocked(target))) return false;
 
-            // If he's away, we _may_ consider him a friend, but we cannot be certain...
-            if (IsFriends(target) || (offline && IsFriendOffered(target))) return true;
+            if (IsFriends(target) || (unilaterally && IsFriendOffered(target))) return true;
 
             return null;
         }

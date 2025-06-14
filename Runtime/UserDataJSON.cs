@@ -181,7 +181,12 @@ namespace Arteranos.Common
         #region Friend handling (from user and relayed from server)
 
         public virtual bool OfferFriend(UserID target, bool offering)
-            => HandleState(target, offering, _friendOffered);
+        {
+            // Think twice before friending a blocked user.
+            if (offering && IsBlocked(target)) return false;
+
+            return HandleState(target, offering, _friendOffered);
+        }
 
         public virtual bool ReceiveFriend(UserID target, bool receiving)
         {
@@ -203,7 +208,7 @@ namespace Arteranos.Common
 
             // Yes, blocking implies revoking friendships with its ramifications. 
             // Blockings hasn't to be incurred just on a whim.
-            if (imposing) OfferFriend(target, false);
+            if (imposing) changed |= OfferFriend(target, false);
 
             return changed;
         }
@@ -213,7 +218,7 @@ namespace Arteranos.Common
             bool changed = HandleState(target, receiving, _blockReceived);
 
             // One of you two were sorely mistaken in the other person...
-            if (receiving) OfferFriend(target, false);
+            if (receiving) changed |= OfferFriend(target, false);
 
             return changed;
         }
@@ -225,6 +230,22 @@ namespace Arteranos.Common
 
         public bool IsFriends(UserID target) => IsFriendOffered(target) && IsFriendReceived(target);
         public bool IsBlocked(UserID target) => _blockImposed.Contains(target) || _blockReceived.Contains(target);
+
+        /// <summary>
+        /// Returns combined block/neither/friend state
+        /// </summary>
+        /// <param name="target">The user</param>
+        /// <param name="offline">Make do with offline/logged out/remote users</param>
+        /// <returns>false - blocked;null - neither;true - friend</returns>
+        public bool? IsStated(UserID target, bool offline = false)
+        {
+            if (IsBlocked(target)) return false;
+
+            // If he's away, we _may_ consider him a friend, but we cannot be certain...
+            if (IsFriends(target) || (offline && IsFriendOffered(target))) return true;
+
+            return null;
+        }
         #endregion
     }
 }

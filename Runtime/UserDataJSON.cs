@@ -245,6 +245,19 @@ namespace Arteranos.Common
 
             return null;
         }
+
+        public IEnumerable<(UserID target, bool? state)> GetAllStates()
+        {
+            foreach (UserID entry in _blockImposed)
+                yield return (entry, false);
+
+            foreach (UserID entry in _friendOffered)
+            {
+                // Blocks win.
+                if (_blockImposed.Contains(entry)) continue;
+                yield return (entry, true);
+            }
+        }
         #endregion
     }
 }

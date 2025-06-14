@@ -34,7 +34,7 @@ namespace Arteranos.Common
                 _dirty = true;
             }
         }
-        public string Nickname
+        public virtual string Nickname
         {
             get => _nickname;
             set
@@ -44,7 +44,7 @@ namespace Arteranos.Common
                 _dirty = true;
             }
         }
-        public Cid Icon
+        public virtual Cid Icon
         {
             get => _icon;
             set
@@ -101,9 +101,22 @@ namespace Arteranos.Common
         public static explicit operator Cid(UserDataJSON u) => u.Icon;
 
         public static explicit operator string(UserDataJSON u) => u.Nickname;
+        private bool HandleState(UserID target, bool newState, HashSet<UserID> stateList)
+        {
+            bool oldState = stateList.Contains(target);
+
+            if (newState)
+                stateList.Add(target);
+            else
+                stateList.Remove(target);
+
+            if (oldState != newState) _dirty = true;
+
+            return oldState != newState;
+        }
 
         #endregion
-
+        // ---------------------------------------------------------------
         #region Load & Save
 
         public static UserDataJSON Generate()
@@ -143,7 +156,7 @@ namespace Arteranos.Common
             return uid;
         }
 
-        public void Save()
+        public virtual void Save()
         {
             try
             {
@@ -164,28 +177,13 @@ namespace Arteranos.Common
         }
 
         #endregion
-
-
-        private bool HandleState(UserID target, bool newState, HashSet<UserID> stateList)
-        {
-            bool oldState = stateList.Contains(target);
-
-            if (newState)
-                stateList.Add(target);
-            else
-                stateList.Remove(target);
-
-            if (oldState != newState) _dirty = true;
-
-            return oldState != newState;
-        }
-
+        // ---------------------------------------------------------------
         #region Friend handling (from user and relayed from server)
 
-        public bool OfferFriend(UserID target, bool offering)
+        public virtual bool OfferFriend(UserID target, bool offering)
             => HandleState(target, offering, _friendOffered);
 
-        public bool ReceiveFriend(UserID target, bool receiving)
+        public virtual bool ReceiveFriend(UserID target, bool receiving)
         {
             bool changed = HandleState(target, receiving, _friendReceived);
 
@@ -196,10 +194,10 @@ namespace Arteranos.Common
             return changed;
         }
         #endregion
-
+        // ---------------------------------------------------------------
         #region Block handling (from user and relayed from server)
 
-        public bool ImposeBlock(UserID target, bool imposing)
+        public virtual bool ImposeBlock(UserID target, bool imposing)
         {
             bool changed = HandleState(target, imposing, _blockImposed);
 
@@ -210,7 +208,7 @@ namespace Arteranos.Common
             return changed;
         }
 
-        public bool ReceiveBlock(UserID target, bool receiving)
+        public virtual bool ReceiveBlock(UserID target, bool receiving)
         {
             bool changed = HandleState(target, receiving, _blockReceived);
 
@@ -220,7 +218,7 @@ namespace Arteranos.Common
             return changed;
         }
         #endregion
-
+        // ---------------------------------------------------------------
         #region Friend & Block effects (in Client)
         public bool IsFriendOffered(UserID target) => _friendOffered.Contains(target);
         public bool IsFriendReceived(UserID target) => _friendReceived.Contains(target);

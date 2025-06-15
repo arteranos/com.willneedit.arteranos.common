@@ -59,7 +59,7 @@ namespace Arteranos.Common
         private string _nickname = null;
         private Cid _icon = null;
         private SignKey _SignKey = null;
-        private bool _dirty = true;
+        protected bool _dirty = true;
 
         [JsonProperty(PropertyName = "FriendOffered")]
         private readonly HashSet<UserID> _friendOffered = new();

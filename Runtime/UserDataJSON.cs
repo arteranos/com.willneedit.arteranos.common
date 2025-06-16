@@ -228,6 +228,8 @@ namespace Arteranos.Common
         public bool IsFriendOffered(UserID target) => _friendOffered.Contains(target);
         public bool IsFriendReceived(UserID target) => _friendReceived.Contains(target);
 
+        public bool IsImposingBlock(UserID target) => _blockImposed.Contains(target);
+
         public bool IsFriends(UserID target) => IsFriendOffered(target) && IsFriendReceived(target);
         public bool IsBlocked(UserID target) => _blockImposed.Contains(target) || _blockReceived.Contains(target);
 

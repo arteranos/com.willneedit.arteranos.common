@@ -24,6 +24,21 @@ namespace Arteranos.Common
 
         public const string PATH_USER_DATA = "UserID.json";
 
+        public UserDataJSON() { }
+        public UserDataJSON(UserDataJSON old)
+        {
+            SignKeyPair = old.SignKeyPair;
+            Nickname = old.Nickname;
+            Icon = old.Icon;
+
+            _blockImposed = old._blockImposed;
+            _blockReceived = old._blockReceived;
+            _friendOffered = old._friendOffered;
+            _friendReceived = old._friendReceived;
+
+            _dirty = old._dirty;
+        }
+
         public byte[] SignKeyPair
         {
             get => _signKeyPair;
@@ -248,16 +263,32 @@ namespace Arteranos.Common
             return null;
         }
 
-        public IEnumerable<(UserID target, bool? state)> GetAllStates()
+        public IEnumerable<(UserID target, bool friendOffered, bool friendReceived, bool blockImposed)> GetAllStates()
         {
+            (UserID target, bool friendOffered, bool friendReceived, bool blockImposed) GetTuple(UserID target)
+                => (
+                    target,
+                    IsFriendOffered(target),
+                    IsFriendReceived(target),
+                    IsImposingBlock(target)
+                );
+
             foreach (UserID entry in _blockImposed)
-                yield return (entry, false);
+                yield return GetTuple(entry);
 
             foreach (UserID entry in _friendOffered)
             {
                 // Blocks win.
                 if (_blockImposed.Contains(entry)) continue;
-                yield return (entry, true);
+                yield return GetTuple(entry);
+            }
+
+            foreach (UserID entry in _friendReceived)
+            {
+                // Blocks win.
+                if (_blockImposed.Contains(entry)) continue;
+                if (_friendOffered.Contains(entry)) continue;
+                yield return GetTuple(entry);
             }
         }
         #endregion

@@ -1,4 +1,12 @@
-﻿using Ipfs;
+﻿/*
+ * Copyright (c) 2025, willneedit
+ * 
+ * Licensed by the Mozilla Public License 2.0,
+ * residing in the LICENSE.md file in the project's root directory.
+ */
+
+using Arteranos.Common.Cryptography;
+using Ipfs;
 using Ipfs.Cryptography.Proto;
 using ProtoBuf;
 using System;
@@ -11,7 +19,7 @@ namespace Arteranos.Common
 {
     [ProtoContract]
     [TypeConverter(typeof(UserIDConverter))]
-    public class UserID : IEquatable<UserID>
+    public class UserID : IEquatable<UserID>, IFingerprintable
     {
         // Has to be there, for serialization.
         [ProtoMember(1)]
@@ -23,10 +31,7 @@ namespace Arteranos.Common
         [ProtoMember(3)]
         public string IconCid = null;
 
-        public UserID()
-        {
-
-        }
+        public UserID() { }
 
         public UserID(PublicKey SignPublicKey, string Nickname)
         {
@@ -51,7 +56,7 @@ namespace Arteranos.Common
         public static UserID Deserialize(byte[] data)
             => Serializer.Deserialize<UserID>(new MemoryStream(data));
 
-        public byte[] Fingerprint => CryptoHelpers.GetFingerprint(SignPublicKey);
+        public byte[] FingerprintBytes => CryptoHelpers.GetFingerprint(SignPublicKey);
 
         public bool Equals(UserID other)
         {

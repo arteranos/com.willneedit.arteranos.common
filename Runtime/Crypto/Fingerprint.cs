@@ -11,6 +11,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using Ipfs;
 using ProtoBuf;
 
 // A more relaxed concept comparing to the IPFS's CID, using a freeform
@@ -37,6 +39,14 @@ namespace Arteranos.Common.Cryptography
 
         #region Construction
         public Fingerprint() { }
+
+        public Fingerprint(Cid cid)
+        {
+            // CID are hashes with some metadata, but we need it done because
+            // them to be comparable, not for tracking to its source.
+            Type = cid.GetType().ToString();
+            FPBytes = CryptoHelpers.GetFingerprint(cid.ToArray());
+        }
 
         public Fingerprint(object ob)
         {
